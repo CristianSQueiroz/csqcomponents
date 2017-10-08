@@ -67,6 +67,15 @@ public class UtilSql {
         return select;
     }
 
+    public static String montaQuery(String tabela, String orderby) {
+        String select = "";
+        select = "select * From " + tabela;
+        if (orderby != null) {
+            select += " order by " + Utilidades.validaString(orderby);
+        }
+        return select;
+    }
+
     public static String montaQuery(HashMap atributos, HashMap restricoes, String tabela, String orderby) {
         String[] temp1 = tabela.split("&");
         String prefix = "";
@@ -75,13 +84,15 @@ public class UtilSql {
         }
         String select = "";
         String where = "";
-        for (Object entrySet : atributos.keySet()) {
-            if (entrySet.toString().contains("DT")) {
-                select += "DATE_FORMAT(" + prefix + entrySet.toString() + ",'%d/%m/%y') , ";
-            } else {
-                select += prefix + entrySet.toString() + " , ";
-            }
+        if (atributos != null) {
+            for (Object entrySet : atributos.keySet()) {
+                if (entrySet.toString().contains("DT")) {
+                    select += "DATE_FORMAT(" + prefix + entrySet.toString() + ",'%d/%m/%y') , ";
+                } else {
+                    select += prefix + entrySet.toString() + " , ";
+                }
 
+            }
         }
         for (Object entrySet : restricoes.entrySet()) {
             if (entrySet.toString().contains("PROCEDURE")) {
@@ -96,7 +107,11 @@ public class UtilSql {
                 where += prefix + entrySet.toString() + " and ";
             }
         }
-        select = "select " + select.substring(0, select.lastIndexOf(",") - 1) + " From " + temp1[0];
+        if (select.equalsIgnoreCase("")) {
+            select = "select * From " + temp1[0];
+        } else {
+            select = "select " + select.substring(0, select.lastIndexOf(",") - 1) + " From " + temp1[0];
+        }
         if (temp1.length > 1) {
             select += " " + temp1[1] + " ";
         }

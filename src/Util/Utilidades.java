@@ -42,18 +42,18 @@ public class Utilidades {
     }
 
     public static long validaLong(Object o) {
-        if (o instanceof Long) {
-            return Long.valueOf(o.toString());
-        } else {
+        try {
+            return Long.parseLong(o.toString());
+        } catch (Exception e) {
             return 0;
         }
     }
 
     public static double validaDouble(Object o) {
-        try{
+        try {
             return Double.valueOf(o.toString());
-        }catch(Exception e){
-            
+        } catch (Exception e) {
+
         }
         return 0;
     }
