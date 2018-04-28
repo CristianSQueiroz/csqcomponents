@@ -18,7 +18,9 @@ public class JTPadrao extends AbstractTableModel {
 
     private ArrayList<HashMap> listaObjetos;
     private ArrayList<String> colunas;
+
     private HashMap nomesColunas;
+    private boolean isJTCGrid;
     private HashMap indexColunas;
 
     public JTPadrao(ArrayList<HashMap> lista) {
@@ -38,6 +40,13 @@ public class JTPadrao extends AbstractTableModel {
         indexColunas = new HashMap();
     }
 
+    public JTPadrao(ArrayList<HashMap> lista, ArrayList<String> nomesColunas) {
+        listaObjetos = lista;
+        this.colunas = nomesColunas;
+        indexColunas = new HashMap();
+        isJTCGrid = true;
+    }
+
     @Override
     public int getRowCount() {
         return listaObjetos.size();
@@ -45,15 +54,19 @@ public class JTPadrao extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return listaObjetos.get(0).keySet().size();
+        return colunas.size();
     }
 
     @Override
     public String getColumnName(int arg0) {
+        if (isJTCGrid) {
+            indexColunas.put(colunas.get(arg0), arg0);
+            return colunas.get(arg0);
+        }
         String retorno = colunas.get(arg0).toUpperCase();
         if (nomesColunas != null) {
             if (retorno.contains("DATE_FORMAT")) {
-                retorno = retorno.substring(retorno.indexOf(".", retorno.indexOf("("))+1, retorno.indexOf(",", retorno.indexOf("(")));
+                retorno = retorno.substring(retorno.indexOf(".", retorno.indexOf("(")) + 1, retorno.indexOf(",", retorno.indexOf("(")));
             }
             if (nomesColunas.containsKey(retorno)) {
                 indexColunas.put(nomesColunas.get(retorno).toString(), arg0);
@@ -66,6 +79,10 @@ public class JTPadrao extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        if (isJTCGrid) {
+            return listaObjetos.get(rowIndex).get("CD_TABELA");
+        }
+
         HashMap hm = listaObjetos.get(rowIndex);
         return hm.get(colunas.get(columnIndex));
     }

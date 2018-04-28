@@ -6,7 +6,14 @@
 package Swing.Panel.DGPanel;
 
 import Contantes.DGPanelConstantes;
+import SQLUtil.ComponetsDb;
+import Util.Utilidades;
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.util.ArrayList;
+import java.util.HashMap;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -14,17 +21,45 @@ import java.awt.CardLayout;
  */
 public class DGPanel extends javax.swing.JPanel {
 
+    private String nmTabela;
     private boolean isGridMode;
+    private boolean isDesignLoaded;
+    private boolean isGridLoaded;
+    private ArrayList<DBPanelAtributo> atributos = new ArrayList<DBPanelAtributo>();
 
     /**
      * Creates new form DGPanel
      */
     public DGPanel() {
         initComponents();
+        init();
+
     }
 
     public void init() {
         setViewMode(DGPanelConstantes.GRIDMODE);
+        dGGridPanel1.getGrid().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent lse) {
+                montaPanelDesign(dGGridPanel1.getGrid().getSelectedRow());
+                System.out.println(dGGridPanel1.getGrid().getSelectedRow());
+            }
+        });
+    }
+
+    public void loadPanel() {
+        for (HashMap hm : ComponetsDb.getAtributosColumns(nmTabela)) {
+            DBPanelAtributo dbPanelAtributo = new DBPanelAtributo();
+            dbPanelAtributo.setNmAtributo(Utilidades.validaString(hm.get("NM_ATRIBUTO")));
+            dbPanelAtributo.setPosX(Utilidades.validaInt(hm.get("POS_X")));
+            dbPanelAtributo.setPosY(Utilidades.validaInt(hm.get("POS_Y")));
+            dbPanelAtributo.setLarguraGrid(Utilidades.validaInt(hm.get("LARGURA_GRID")));
+            dbPanelAtributo.setLarguraDesign(Utilidades.validaInt(hm.get("LARGURA_DESIGN")));
+            dbPanelAtributo.setAlturaDesign(Utilidades.validaInt(hm.get("ALTURA_DESIGN")));
+            dbPanelAtributo.setTipoComponente(Utilidades.validaString(hm.get("TIPO_COMPONENTE")));
+            dbPanelAtributo.setDsAtributo(Utilidades.validaString(hm.get("DS_ATRIBUTO")));
+            atributos.add(dbPanelAtributo);
+        }
     }
 
     public void changeViewMode() {
@@ -37,16 +72,27 @@ public class DGPanel extends javax.swing.JPanel {
 
     public void setViewMode(DGPanelConstantes view) {
         if (view.equals(DGPanelConstantes.GRIDMODE)) {
+            if (!isGridLoaded && atributos.size() > 0) {
+                dGGridPanel1.setAtributos(atributos, nmTabela);
+                isGridLoaded = true;
+            }
             ((CardLayout) (panelControlador.getLayout())).show(panelControlador, "GridMode");
+            System.out.println("GridMode");
             isGridMode = true;
         } else if (view.equals(DGPanelConstantes.DESIGNMODE)) {
             ((CardLayout) (panelControlador.getLayout())).show(panelControlador, "designMode");
+            montaPanelDesign();
+            System.out.println("designMode");
             isGridMode = false;
         }
     }
-    
-    public void montaPanelDesign(){
-        
+
+    public void montaPanelDesign(int line) {
+        dBDesignPanel1.setAtributos(atributos, null, line);
+    }
+
+    public void montaPanelDesign() {
+        dBDesignPanel1.setAtributos(atributos, null, 0);
     }
 
     /**
@@ -58,65 +104,85 @@ public class DGPanel extends javax.swing.JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jCPanel1 = new ComponentesVisuais.JCPanel();
         panelControlador = new javax.swing.JPanel();
-        gridSP = new javax.swing.JScrollPane();
-        gridTable = new javax.swing.JTable();
-        designView = new javax.swing.JPanel();
-        jButton1 = new javax.swing.JButton();
+        dBDesignPanel1 = new Swing.Panel.DGPanel.DBDesignPanel();
+        dGGridPanel1 = new Swing.Panel.DGPanel.DGGridPanel();
+        jToolBar1 = new javax.swing.JToolBar();
+        jButtonPadrao1 = new Botões.JButtonPadrao();
 
         setLayout(new java.awt.BorderLayout());
 
+        jCPanel1.setLayout(new java.awt.BorderLayout());
+
         panelControlador.setLayout(new java.awt.CardLayout());
 
-        gridTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Title 1", "Title 2", "Title 3", "Title 4"
-            }
-        ));
-        gridSP.setViewportView(gridTable);
-
-        panelControlador.add(gridSP, "GridMode");
-
-        javax.swing.GroupLayout designViewLayout = new javax.swing.GroupLayout(designView);
-        designView.setLayout(designViewLayout);
-        designViewLayout.setHorizontalGroup(
-            designViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        javax.swing.GroupLayout dBDesignPanel1Layout = new javax.swing.GroupLayout(dBDesignPanel1);
+        dBDesignPanel1.setLayout(dBDesignPanel1Layout);
+        dBDesignPanel1Layout.setHorizontalGroup(
+            dBDesignPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 447, Short.MAX_VALUE)
         );
-        designViewLayout.setVerticalGroup(
-            designViewLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        dBDesignPanel1Layout.setVerticalGroup(
+            dBDesignPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 427, Short.MAX_VALUE)
         );
 
-        panelControlador.add(designView, "designMode");
+        panelControlador.add(dBDesignPanel1, "designMode");
+        panelControlador.add(dGGridPanel1, "GridMode");
 
-        add(panelControlador, java.awt.BorderLayout.CENTER);
+        jCPanel1.add(panelControlador, java.awt.BorderLayout.CENTER);
 
-        jButton1.setText("jButton1");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jToolBar1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        jToolBar1.setRollover(true);
+        jToolBar1.setMargin(new java.awt.Insets(5, 5, 5, 5));
+
+        jButtonPadrao1.setText("Detalhe/Form");
+        jButtonPadrao1.setFocusable(false);
+        jButtonPadrao1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        jButtonPadrao1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        jButtonPadrao1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                changeJBActionPerformed(evt);
             }
         });
-        add(jButton1, java.awt.BorderLayout.SOUTH);
+        jToolBar1.add(jButtonPadrao1);
+
+        jCPanel1.add(jToolBar1, java.awt.BorderLayout.EAST);
+
+        add(jCPanel1, java.awt.BorderLayout.CENTER);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void changeJBActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_changeJBActionPerformed
         changeViewMode();
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_changeJBActionPerformed
+
+    /**
+     * Get the value of nmTabela
+     *
+     * @return the value of nmTabela
+     */
+    public String getNmTabela() {
+        return nmTabela;
+    }
+
+    /**
+     * Set the value of nmTabela
+     *
+     * @param nmTabela new value of nmTabela
+     */
+    public void setNmTabela(String nmTabela) {
+        this.nmTabela = nmTabela;
+        loadPanel();
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JPanel designView;
-    private javax.swing.JScrollPane gridSP;
-    private javax.swing.JTable gridTable;
-    private javax.swing.JButton jButton1;
+    private Swing.Panel.DGPanel.DBDesignPanel dBDesignPanel1;
+    private Swing.Panel.DGPanel.DGGridPanel dGGridPanel1;
+    private Botões.JButtonPadrao jButtonPadrao1;
+    private ComponentesVisuais.JCPanel jCPanel1;
+    private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel panelControlador;
     // End of variables declaration//GEN-END:variables
 }

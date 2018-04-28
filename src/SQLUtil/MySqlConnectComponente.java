@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import javax.swing.JOptionPane;
 
-public class MySqlConnect {
+public class MySqlConnectComponente {
 
     Connection conn;
 
@@ -28,18 +28,14 @@ public class MySqlConnect {
 
     String urlComposto = "jdbc:mysql://" + url + ":" + porta + "/" + db;
 
-    private static MySqlConnect connect;
+    private static MySqlConnectComponente connect;
 
 
-    public static MySqlConnect getInstance() {
+    public static MySqlConnectComponente getInstance() {
         if (connect == null) {
-            connect = new MySqlConnect();
+            connect = new MySqlConnectComponente();
         }
         return connect;
-    }
-
-    private MySqlConnect() {
-
     }
 
     public void open() {
@@ -140,4 +136,54 @@ public class MySqlConnect {
         }
         return false;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getPorta() {
+        return porta;
+    }
+
+    public void setPorta(String porta) {
+        this.porta = porta;
+    }
+
+    public String getDb() {
+        return db;
+    }
+
+    public void setDb(String db) {
+        this.db = db;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public void setUser(String user) {
+        this.user = user;
+    }
+
+    public String getPass() {
+        return pass;
+    }
+
+    public void setPass(String pass) {
+        this.pass = pass;
+    }
+
+    public static MySqlConnectComponente getConnect() {
+        return connect;
+    }
+
+    public static void setConnect(MySqlConnectComponente connect) {
+        MySqlConnectComponente.connect = connect;
+    }
+    
+    
 }
